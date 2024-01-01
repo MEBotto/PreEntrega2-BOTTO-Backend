@@ -1,19 +1,55 @@
 <div>
-    <h1>
-        Datos para el producto:
-    </h1>
-    <form>
-        <input type="text" name="title" id="title" placeholder="Title">
-        <input type="text" name="description" id="description" placeholder="Description">
-        <input type="number" name="price" id="price" placeholder="Price">
-        <input type="text" name="thumbnail" id="thumbnails" placeholder="Thumbnail">
-        <input type="text" name="code" id="code" placeholder="Code">
-        <input type="number" name="stock" id="stock" placeholder="Stock">
-        <input type="submit" value="Send">
-    </form>
-    <h2>Lista de productos:</h2>
-    <div id="products"></div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col"> Title </th>
+        <th scope="col"> Description </th>
+        <th scope="col"> Price </th>
+        <th scope="col"> Thumbnail </th>
+        <th scope="col"> Code </th>
+        <th scope="col"> Stock </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each products.docs}}
+        <tr>
+          <td> {{this.title}}</td>
+          <td> {{this.description}}</td>
+          <td> {{this.price}} </td>
+          <td> {{this.thumbnails}}</td>
+          <td> {{this.code}}</td>
+          <td> {{this.stock}} </td>
+        </tr>
+      {{/each}}
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/main.js"></script>
+    </tbody>
+
+  </table>
+  <div class="position-relative m-4">
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {{#if products.hasPrevPage}}
+          <li class="page-item"><a
+              class="page-link"
+              href="/products?page={{products.prevPage}}&&limit=10"
+            >Previous</a></li>
+        {{/if}}
+
+        {{!-- Links a siguientes páginas --}}
+
+        {{#if products.hasNextPage}}
+          <li class="page-item"><a
+              class="page-link"
+              href="/products?page={{products.nextPage}}&&limit=10"
+            >Next</a></li>
+        {{/if}}
+
+      </ul>
+    </nav>
+    <p class="btn btn-primary">
+      Current Page:
+      {{products.page}}
+    </p>
+  </div>
 </div>

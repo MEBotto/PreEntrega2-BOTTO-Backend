@@ -54,16 +54,17 @@ router.get("/:cid", async(req, res) => {
 
 router.put("/:cid", async(req, res) => {
   try {
-    const { id } = req.params;
-    const cart = await cartDao.updateCart(id, req.body);
+    const { id } = req.params
+    const { products } = req.body
+    const cart = await cartDao.updateCartWithProducts(id, products);
     res.json({
       data: cart,
       message: "Cart updated"
     })
   }
   catch(error) {
-    console.log(error);
-    res.json({
+    console.log(error)
+    res.status(500).json({
       error,
       message: "Error"
     });
@@ -73,17 +74,17 @@ router.put("/:cid", async(req, res) => {
 router.delete("/:cid", async(req, res) => {
   try {
     const { id } = req.params;
-    const cart = await cartDao.deleteCart(id);
+    const cart = await cartDao.deleteAllProductsFromCart(id);
     res.json({
       data: cart,
-      message: "Cart deleted"
+      message: "Products deleted"
     })
   }
   catch(error) {
     console.log(error);
-    res.json({
+    res.status(500).json({
       error,
-      message: "Error"
+      message: error.message
     });
   }
 })
@@ -98,6 +99,33 @@ router.post("/:cid/product/:pid", async (req, res) => {
       });
   } catch (error) {
       res.status(400).json({ error: error.message });
+  }
+})
+
+router.put('/:cid/products/:pid', async (req,res)=>{
+  const { cid, pid } = req.params
+  const { quantity } = req.body
+  try {
+    const result = await cartDao.updateProductQuantity(cid, pid, quantity)
+    res.json({
+        result,
+        message: "Product updated"
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  } 
+})
+
+router.delete("/:cid/products/:pid", async (req, res) => {
+  const { cid, pid } = req.params
+  try {
+    const result = await cartDao.deleteProductFromCart(cid, pid)
+    res.json({
+      result,
+      message: "Product deleted"
+  })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
   }
 })
 

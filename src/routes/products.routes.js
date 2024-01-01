@@ -5,7 +5,8 @@ const router = Router()
 
 router.get("/", async (req, res) => {
   try {
-    const products = await productDao.getProducts();
+    const { limit, page, query, sort } = req.query
+    const products = await productDao.getProducts(limit, page, query, sort)
     res.json({
       data: products,
       message: "Products list"

@@ -59,7 +59,95 @@ class CartDao {
   }
 
   async getProductsFromCart(id){
-    return await cartModel.findById(id).populate({path: 'products.product', model: productModel, select: 'title description price thumbnail code stock'})
+    return await cartModel.findById(id).populate({path: 'products.product', model: productModel, select: 'title description price thumbnail code stock'}).lean()
+  }
+
+  async updateProductQuantity(cartId, productId, newQuantity){
+    try {
+      const cart = await cartModel.findById(cartId)
+  
+      if (!cart) {
+        throw new Error('Carrito no encontrado')
+      }
+  
+      const product = cart.products.find(p => p._id.equals(productId))
+  
+      if (!product) {
+        throw new Error('Producto no encontrado en el carrito')
+      }
+  
+      product.quantity = newQuantity;
+      await cart.save()
+  
+      return cart;
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async deleteProductFromCart(cartId, productId) {
+    try {
+      const cart = await cartModel.findById(cartId)
+  
+      if (!cart) {
+        throw new Error('Carrito no encontrado')
+      }
+  
+      const initialProductCount = cart.products.length
+  
+      cart.products = cart.products.filter(p => !p._id.equals(productId))
+  
+      if (cart.products.length === initialProductCount) {
+        throw new Error('Producto no encontrado en el carrito')
+      }
+  
+      await cart.save();
+      return cart
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async updateCartWithProducts(cartId, newProducts) {
+    try {
+      const cart = await cartModel.findById(cartId)
+  
+      if (!cart) {
+        throw new Error('Carrito no encontrado')
+      }
+  
+      cart.products = []
+  
+      newProducts.forEach(product => {
+        cart.products.push({
+          product: product.productId,
+          quantity: product.quantity
+        })
+      })
+  
+      await cart.save();
+
+      return cart
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async deleteAllProductsFromCart(cartId) {
+    try {
+      const cart = await cartModel.findById(cartId)
+  
+      if (!cart) {
+        throw new Error('Carrito no encontrado')
+      }
+  
+      cart.products = []
+      await cart.save()
+  
+      return cart
+    } catch (error) {
+      throw error
+    }
   }
 }
 
